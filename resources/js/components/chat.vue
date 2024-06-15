@@ -5,8 +5,23 @@ import Avatar from "primevue/avatar";
 import InputGroup from "primevue/inputgroup";
 import InputText from "primevue/inputtext";
 import Button from "primevue/button";
+import Card from "primevue/card";
 import Tag from "primevue/tag";
-import {onMounted, reactive, ref} from "vue";
+import {onMounted, reactive, ref, watch} from "vue";
+import useChat from "@/composable/chat.js";
+import {router} from "@/router/index.js";
+
+
+const {getChat} = useChat();
+const chat = ref();
+
+
+watch(router.currentRoute, () => {
+    let {params} = router.currentRoute.value;
+    chat.value = getChat(+params.id);
+})
+
+
 
 const message = ref("");
 
@@ -44,6 +59,9 @@ const sendMessage = () => {
 }
 
 onMounted(() => {
+    let {params} = router.currentRoute.value;
+    chat.value = getChat(+params.id);
+
     setTimeout(() => {
         let element = document.querySelectorAll(".message-panel");
         element[element.length - 1].scrollIntoView({block: "center", behavior: "instant"});
@@ -52,42 +70,52 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="chat">
-        <ScrollPanel style="width: 100%; height: 100%;">
-            <div
-                v-for="message in messages"
-                class="message-panel"
-                :key="message.id">
-                <template v-if="message.sender !== 'me'">
-                    <Avatar label="O" class="mr-2" size="large" style="background-color: #ece9fc; color: #2a1261"
-                            shape="circle"/>
-                    <p class="message">{{ message.text }}</p>
-                    <p class="date">{{ new Date().toLocaleTimeString() }}</p>
-
-                </template>
-                <template v-else>
-                    <div class="message-left">
+    <Card v-if="chat" class="chat">
+        <template #header>
+            <div class="header">
+                <Avatar :label="chat.name[0]" class="mr-2" size="large"
+                        shape="circle"/>
+                <span class="font-bold">{{ chat.name }}</span>
+            </div>
+        </template>
+        <template #content>
+            <ScrollPanel style="width: 100%; height: calc(100vh - 235px);">
+                <div
+                    v-for="message in messages"
+                    class="message-panel"
+                    :key="message.id">
+                    <template v-if="message.sender !== 'me'">
+                        <Avatar :label="chat.name[0]" class="mr-2" size="large" style="background-color: #ece9fc; color: #2a1261"
+                                shape="circle"/>
                         <p class="message">{{ message.text }}</p>
                         <p class="date">{{ new Date().toLocaleTimeString() }}</p>
-                    </div>
-                </template>
-            </div>
-        </ScrollPanel>
-        <InputGroup style="margin-top: 10px; width: 100%; display: flex;">
-            <InputText @keydown.enter="sendMessage" type="text" v-model="message" placeholder="Введите сообщение"/>
-            <Button @click="sendMessage" icon="pi pi-send" severity="success"/>
-        </InputGroup>
-    </div>
 
-<!--    <div v-else class="no-chat">-->
-<!--        <Tag style="font-size: 1rem" severity="info" value="Выберите чат"></Tag>-->
-<!--    </div>-->
+                    </template>
+                    <template v-else>
+                        <div class="message-left">
+                            <p class="message">{{ message.text }}</p>
+                            <p class="date">{{ new Date().toLocaleTimeString() }}</p>
+                        </div>
+                    </template>
+                </div>
+            </ScrollPanel>
+        </template>
+        <template #footer>
+            <InputGroup style="margin-top: 10px; width: 100%; display: flex;">
+                <InputText @keydown.enter="sendMessage" type="text" v-model="message" placeholder="Введите сообщение"/>
+                <Button @click="sendMessage" icon="pi pi-send" severity="success"/>
+            </InputGroup>
+        </template>
+    </Card>
+
+    <div v-else class="no-chat">
+        <Tag style="font-size: 1rem" severity="info" value="Выберите чат"></Tag>
+    </div>
 </template>
 
 <style lang="scss">
 .chat {
     width: 100%;
-    height: calc(100vh - 90px - 46px);
     border: 1px solid #e2e8f0;
 }
 
@@ -97,6 +125,17 @@ onMounted(() => {
     align-items: center;
     width: 100%;
     border: 1px solid #e2e8f0;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 15px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.p-card-content {
 }
 
 .p-card-body {

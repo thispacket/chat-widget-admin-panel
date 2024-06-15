@@ -1,12 +1,10 @@
 <script setup>
 import Menubar from "primevue/menubar";
 import {ref} from "vue";
-import ChatSidebar from "../js/components/chat-sidebar.vue";
-import Chat from "../js/components/chat.vue";
-import InputText from "primevue/inputtext";
-import Divider from "primevue/divider";
 import Button from "primevue/button";
-import Dialog from "primevue/dialog";
+import Avatar from "primevue/avatar";
+import Ripple from "primevue/ripple";
+import SplitButton from "primevue/splitbutton";
 
 const visible = ref(false);
 
@@ -33,11 +31,30 @@ const items = [
     }
 ];
 
+const profileItems = [
+    {
+        label: 'Выход',
+        icon: 'pi pi-fw pi-power-off',
+        url: '/logout',
+        class: 'p-button-danger'
+    }
+];
 
 </script>
 
 <template>
-    <Menubar :model="items"/>
+    <div class="navigation">
+        <Menubar :model="items"/>
+
+        <SplitButton label="Login" :model="profileItems" class="bg-danger" @click="visible = true">
+            <Avatar style="background-color: #86B32D;" label="Е" class="mr-2" shape="circle" />
+            <span class="info inline-flex flex-col items-start">
+                <span class="font-bold">Егор</span>
+                <span class="text-sm-end">Admin</span>
+            </span>
+        </SplitButton>
+    </div>
+
 
     <router-view/>
 </template>
@@ -46,6 +63,18 @@ const items = [
 body {
     overflow-x: hidden;
     overflow-y: hidden;
+}
+
+.text-sm-end {
+    font-size: 12px
+}
+
+.info {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    margin-left: 20px;
 }
 
 .body {
@@ -64,6 +93,11 @@ body {
 .button-group {
     display: flex;
     gap: 10px;
+}
+
+.navigation {
+    display: flex;
+    justify-content: space-between;
 }
 
 </style>
