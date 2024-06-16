@@ -55,7 +55,6 @@ const profileItems = [
         </SplitButton>
     </div>
 
-
     <router-view/>
 </template>
 

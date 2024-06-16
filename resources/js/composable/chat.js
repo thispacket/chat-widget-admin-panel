@@ -24,7 +24,7 @@ export default function useChat() {
         }
     ])
 
-    const chat = ref(chats.value[0]);
+    const chat = ref({});
 
     const viewChat = (id) => {
         router.push({name: "chat-page", params: {id: id}})

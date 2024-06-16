@@ -10,19 +10,21 @@ import Tag from "primevue/tag";
 import {onMounted, reactive, ref, watch} from "vue";
 import useChat from "@/composable/chat.js";
 import {router} from "@/router/index.js";
+import Toast from 'primevue/toast';
+import {useToast} from "primevue/usetoast";
 
+
+const toast = useToast();
 
 const {getChat} = useChat();
 const chat = ref();
-
 
 watch(router.currentRoute, () => {
     let {params} = router.currentRoute.value;
     chat.value = getChat(+params.id);
 })
 
-
-
+const invalid = ref(false);
 const message = ref("");
 
 const messages = ref([
@@ -43,7 +45,21 @@ const messages = ref([
     }
 ])
 
+const closeChat = () => {
+    chat.value = null
+    router.push({name: 'chat'})
+}
+
+
 const sendMessage = () => {
+    if (message.value.length === 0) {
+        invalid.value = true;
+        toast.add({severity: 'error', summary: 'Ошибка', detail: 'Сообщение не должно быть пустым', life: 3000});
+        return
+    }
+
+    invalid.value = false;
+
     messages.value.push({
         id: messages.value.length + 1,
         text: message.value,
@@ -70,12 +86,17 @@ onMounted(() => {
 </script>
 
 <template>
+    <Toast severity="error" life="3000" position="top-right" message="213" error-icon="pi pi-exclamation-triangle"/>
+
+
     <Card v-if="chat" class="chat">
         <template #header>
             <div class="header">
                 <Avatar :label="chat.name[0]" class="mr-2" size="large"
                         shape="circle"/>
                 <span class="font-bold">{{ chat.name }}</span>
+
+                <Button @click="closeChat" icon="pi pi-times" severity="success" :style="{marginLeft: 'auto'}" text rounded aria-label="Cancel" />
             </div>
         </template>
         <template #content>
@@ -102,15 +123,11 @@ onMounted(() => {
         </template>
         <template #footer>
             <InputGroup style="margin-top: 10px; width: 100%; display: flex;">
-                <InputText @keydown.enter="sendMessage" type="text" v-model="message" placeholder="Введите сообщение"/>
-                <Button @click="sendMessage" icon="pi pi-send" severity="success"/>
+                <InputText :invalid="invalid" @keydown.enter="sendMessage" type="text" v-model="message" placeholder="Введите сообщение"/>
+                <Button  @click="sendMessage" icon="pi pi-send" :severity="invalid ? 'danger' : 'success'"/>
             </InputGroup>
         </template>
     </Card>
-
-    <div v-else class="no-chat">
-        <Tag style="font-size: 1rem" severity="info" value="Выберите чат"></Tag>
-    </div>
 </template>
 
 <style lang="scss">

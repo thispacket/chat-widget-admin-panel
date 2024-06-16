@@ -7,6 +7,7 @@ import InputIcon from "primevue/inputicon";
 import IconField from "primevue/iconfield";
 import Skeleton from 'primevue/skeleton';
 import Button from "primevue/button";
+import Badge from "primevue/badge";
 import {ref, watch} from "vue";
 
 import useChat from "../composable/chat.js";
@@ -32,9 +33,14 @@ const search = () => {
     }
 }
 
+const viewAllChat = () => allChats.value = chats.value;
+
+const viewUnreadChat = () => allChats.value = chats.value.filter(chat => chat.new);
 </script>
 
 <template>
+
+
     <div class="chat-sidebar">
         <IconField class="search">
             <InputIcon>
@@ -43,14 +49,21 @@ const search = () => {
             <InputText @input="search" v-model="searchInput" type="text" placeholder="Search"/>
         </IconField>
 
-        <ScrollPanel v-if="!isLoading" style="width: 100%; calc(100vh - 150px);">
+        <ButtonGroup style="gap: 10px; display: flex">
+            <Button @click="viewAllChat" icon="pi pi-eye" label="Все" severity="success" :text="false"/>
+            <Button @click="viewUnreadChat" icon="pi pi-eye-slash" label="Непрочитанные" severity="help" :text="false"/>
+        </ButtonGroup>
+
+        <ScrollPanel v-if="!isLoading" style="width: 100%; calc(100vh - 190px);">
             <div class="chat-item" v-for="chat in allChats" @click="viewChat(chat.id)">
                 <Avatar style="width: 3rem !important;" :label="chat.name[0]" class="mr-2" size="large" shape="circle"/>
                 <div class="chat-item__info">
                     <div class="chat-item__name">
                         <div class="name">
                             <span>{{ chat.name }}</span>
-                            <Tag v-if="chat.new" value="Новое"></Tag>
+                            <Badge v-if="chat.new" size="small" value="3" severity="success"></Badge>
+
+                            <!--                            <Tag v-if="chat.new" value="Новое"></Tag>-->
                         </div>
                         <div class="date">{{ new Date().toLocaleTimeString() }}</div>
                     </div>
@@ -61,8 +74,8 @@ const search = () => {
             </div>
         </ScrollPanel>
 
-        <ScrollPanel v-else style="width: 100%; height: calc(100vh - 150px);">
-            <div class="chat-item" v-for="i in 20" @click="viewChat(chat.id)">
+        <ScrollPanel v-else style="width: 100%; height: calc(100vh - 190px);">
+            <div class="chat-item" v-for="i in 20">
                 <Skeleton shape="circle" size="4rem" class="mr-2"></Skeleton>
 
                 <div class="chat-item__info skeleton" style="">

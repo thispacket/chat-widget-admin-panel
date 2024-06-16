@@ -3,6 +3,9 @@
 import Chat from "@/components/chat.vue";
 import ChatSidebar from "@/components/chat-sidebar.vue";
 import useChat from "@/composable/chat.js";
+import Tag from "primevue/tag";
+import {router} from "@/router/index.js";
+import InlineMessage from "primevue/inlinemessage";
 
 const {chat} = useChat();
 
@@ -11,7 +14,12 @@ const {chat} = useChat();
 <template>
     <div class="body">
         <ChatSidebar/>
-        <router-view :chat="chat"/>
+
+        <div v-if="router.currentRoute.value.name === 'chat'" class="no-chat">
+            <InlineMessage severity="info">Выберите чат</InlineMessage>
+        </div>
+
+        <router-view v-else :chat="chat"/>
     </div>
 </template>
 
