@@ -35,7 +35,7 @@ const profileItems = [
     {
         label: 'Выход',
         icon: 'pi pi-fw pi-power-off',
-        url: '/logout',
+        url: '/login',
         class: 'p-button-danger'
     }
 ];

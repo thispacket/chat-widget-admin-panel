@@ -88,7 +88,6 @@ onMounted(() => {
 <template>
     <Toast severity="error" life="3000" position="top-right" message="213" error-icon="pi pi-exclamation-triangle"/>
 
-
     <Card v-if="chat" class="chat">
         <template #header>
             <div class="header">

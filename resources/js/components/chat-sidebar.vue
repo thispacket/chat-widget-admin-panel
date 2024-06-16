@@ -8,6 +8,7 @@ import IconField from "primevue/iconfield";
 import Skeleton from 'primevue/skeleton';
 import Button from "primevue/button";
 import Badge from "primevue/badge";
+import ButtonGroup from "primevue/buttongroup";
 import {ref, watch} from "vue";
 
 import useChat from "../composable/chat.js";
@@ -39,8 +40,6 @@ const viewUnreadChat = () => allChats.value = chats.value.filter(chat => chat.ne
 </script>
 
 <template>
-
-
     <div class="chat-sidebar">
         <IconField class="search">
             <InputIcon>
@@ -50,8 +49,8 @@ const viewUnreadChat = () => allChats.value = chats.value.filter(chat => chat.ne
         </IconField>
 
         <ButtonGroup style="gap: 10px; display: flex">
-            <Button @click="viewAllChat" icon="pi pi-eye" label="Все" severity="success" :text="false"/>
-            <Button @click="viewUnreadChat" icon="pi pi-eye-slash" label="Непрочитанные" severity="help" :text="false"/>
+            <Button style="width: 100%" @click="viewAllChat" icon="pi pi-eye" label="Все" severity="success" :text="false"/>
+            <Button style="width: 100%" @click="viewUnreadChat" icon="pi pi-eye-slash" label="Непрочитанные" severity="help" :text="false"/>
         </ButtonGroup>
 
         <ScrollPanel v-if="!isLoading" style="width: 100%; calc(100vh - 190px);">
@@ -98,7 +97,7 @@ const viewUnreadChat = () => allChats.value = chats.value.filter(chat => chat.ne
 
 .chat-sidebar {
     padding: 10px;
-    width: 30em;
+    width: 30rem;
     height: calc(100vh - 90px);
     z-index: 2;
     border: 1px solid #e2e8f0;
