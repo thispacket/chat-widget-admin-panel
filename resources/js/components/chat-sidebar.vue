@@ -48,7 +48,7 @@ const viewUnreadChat = () => allChats.value = chats.value.filter(chat => chat.ne
             <InputText @input="search" v-model="searchInput" type="text" placeholder="Search"/>
         </IconField>
 
-        <ButtonGroup style="gap: 10px; display: flex">
+        <ButtonGroup style="display: flex">
             <Button style="width: 100%" @click="viewAllChat" icon="pi pi-eye" label="Все" severity="success" :text="false"/>
             <Button style="width: 100%" @click="viewUnreadChat" icon="pi pi-eye-slash" label="Непрочитанные" severity="help" :text="false"/>
         </ButtonGroup>

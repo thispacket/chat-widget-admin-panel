@@ -13,21 +13,6 @@ const items = [
         label: 'Главная',
         icon: 'pi pi-fw pi-home',
         url: '/'
-    },
-    {
-        label: 'Профиль',
-        icon: 'pi pi-fw pi-user',
-        url: '/profile'
-    },
-    {
-        label: 'Пользователи',
-        icon: 'pi pi-fw pi-users',
-        url: '/users'
-    },
-    {
-        label: 'Сообщения',
-        icon: 'pi pi-fw pi-envelope',
-        url: '/messages'
     }
 ];
 
@@ -47,7 +32,7 @@ const profileItems = [
         <Menubar :model="items"/>
 
         <SplitButton label="Login" :model="profileItems" class="bg-danger" @click="visible = true">
-            <Avatar style="background-color: #86B32D;" label="Е" class="mr-2" shape="circle" />
+            <Avatar style="background-color: white; color: #2a1261" label="Е" class="mr-2" shape="circle" />
             <span class="info inline-flex flex-col items-start">
                 <span class="font-bold">Егор</span>
                 <span class="text-sm-end">Admin</span>
