@@ -1,10 +1,10 @@
 <script setup>
 import Menubar from "primevue/menubar";
-import {ref} from "vue";
-import Button from "primevue/button";
+import {onMounted, ref} from "vue";
 import Avatar from "primevue/avatar";
-import Ripple from "primevue/ripple";
 import SplitButton from "primevue/splitbutton";
+import useUser from "@/composable/user.js";
+import {router} from "@/router/index.js";
 
 const visible = ref(false);
 
@@ -25,16 +25,19 @@ const profileItems = [
     }
 ];
 
+const {user} = useUser();
+const letter = ref('A');
+
 </script>
 
 <template>
-    <div class="navigation">
+    <div v-if="router.currentRoute.value.path !== '/widget'" class="navigation">
         <Menubar :model="items"/>
 
         <SplitButton label="Login" :model="profileItems" class="bg-danger" @click="visible = true">
-            <Avatar style="background-color: white; color: #2a1261" label="Е" class="mr-2" shape="circle" />
+            <Avatar style="background-color: white; color: #2a1261" :label="user.firstName ? user.firstName[0] : ''" class="mr-2" shape="circle" />
             <span class="info inline-flex flex-col items-start">
-                <span class="font-bold">Егор</span>
+                <span class="font-bold">{{ user.firstName }}</span>
                 <span class="text-sm-end">Admin</span>
             </span>
         </SplitButton>

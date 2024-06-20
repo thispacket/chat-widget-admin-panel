@@ -19,3 +19,10 @@ Route::get('/', function () {
 });
 
 
+Route::get('/widget', function () {
+    return view('index');
+
+});
+
+
+

@@ -12,12 +12,30 @@ import useChat from "@/composable/chat.js";
 import {router} from "@/router/index.js";
 import Toast from 'primevue/toast';
 import {useToast} from "primevue/usetoast";
+import axios from "axios";
+import Echo from "laravel-echo";
 
+
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: 'bfe10eaad2e57259f9bf',
+    cluster: 'eu',
+    encrypted: false,
+    wsHost: window.location.hostname,
+    wsPort: 6001,
+    disableStats: false,
+    forceTLS: false,
+});
 
 const toast = useToast();
 
-const {getChat} = useChat();
-const chat = ref();
+const {getChat, chat} = useChat();
+
+let currentChat = ref({});
+
+watch(() => chat.value, () => {
+    currentChat.value = chat.value
+})
 
 watch(router.currentRoute, () => {
     let {params} = router.currentRoute.value;
@@ -28,21 +46,7 @@ const invalid = ref(false);
 const message = ref("");
 
 const messages = ref([
-    {
-        id: 1,
-        text: "Hello, how are you?",
-        sender: "me"
-    },
-    {
-        id: 2,
-        text: "I am fine. How about you?",
-        sender: "other"
-    },
-    {
-        id: 3,
-        text: "I am good too. How about you?",
-        sender: "me"
-    }
+
 ])
 
 const closeChat = () => {
@@ -60,11 +64,26 @@ const sendMessage = () => {
 
     invalid.value = false;
 
-    messages.value.push({
-        id: messages.value.length + 1,
-        text: message.value,
-        sender: "me"
-    });
+    axios({
+        method: 'post',
+        url: '/api/chats/' + chat.value.id + '/messages',
+        data: {
+            chat_id: chat.value.id,
+            sender: 'operator',
+            text: message.value
+        }
+    }).then(response => {
+    }).catch(err => {
+        console.log(err);
+    })
+
+    window.Echo.channel('chat')
+        .listen('NewChatMessage', (e) => {
+            window.Echo.channel('chat')
+                .listen('NewChatMessage', (e) => {
+                    getChat(chat.value.id)
+                });
+        });
 
     setTimeout(() => {
         let element = document.querySelectorAll(".message-panel");
@@ -73,7 +92,6 @@ const sendMessage = () => {
 
     message.value = "";
 }
-
 onMounted(() => {
     let {params} = router.currentRoute.value;
     chat.value = getChat(+params.id);
@@ -82,6 +100,14 @@ onMounted(() => {
         let element = document.querySelectorAll(".message-panel");
         element[element.length - 1].scrollIntoView({block: "center", behavior: "instant"});
     }, 100)
+
+    window.Echo.channel('chat')
+        .listen('NewChatMessage', (e) => {
+            window.Echo.channel('chat')
+                .listen('NewChatMessage', (e) => {
+                    getChat(chat.value.id)
+                });
+        });
 })
 </script>
 
@@ -91,9 +117,9 @@ onMounted(() => {
     <Card v-if="chat" class="chat">
         <template #header>
             <div class="header">
-                <Avatar :label="chat.name[0]" class="mr-2" size="large"
+                <Avatar :label="chat.client ? chat.client.name[0] : ''" class="mr-2" size="large"
                         shape="circle"/>
-                <span class="font-bold">{{ chat.name }}</span>
+                <span class="font-bold">{{ chat.client ? chat.client.name : ''}}</span>
 
                 <Button @click="closeChat" icon="pi pi-times" severity="success" :style="{marginLeft: 'auto'}" text rounded aria-label="Cancel" />
             </div>
@@ -101,20 +127,20 @@ onMounted(() => {
         <template #content>
             <ScrollPanel style="width: 100%; height: calc(100vh - 235px);">
                 <div
-                    v-for="message in messages"
+                    v-for="message in chat.messages"
                     class="message-panel"
                     :key="message.id">
-                    <template v-if="message.sender !== 'me'">
-                        <Avatar :label="chat.name[0]" class="mr-2" size="large" style="background-color: #ece9fc; color: #2a1261"
+                    <template v-if="message.sender !== 'operator'">
+                        <Avatar :label="chat.client ? chat.client.name[0] : ''" class="mr-2" size="large" style="background-color: #ece9fc; color: #2a1261"
                                 shape="circle"/>
                         <p class="message">{{ message.text }}</p>
-                        <p class="date">{{ new Date().toLocaleTimeString() }}</p>
+                        <p class="date">{{ message.timestamp }}</p>
 
                     </template>
                     <template v-else>
                         <div class="message-left">
                             <p class="message">{{ message.text }}</p>
-                            <p class="date">{{ new Date().toLocaleTimeString() }}</p>
+                            <p class="date">{{ message.timestamp }}</p>
                         </div>
                     </template>
                 </div>

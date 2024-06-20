@@ -6,8 +6,13 @@ import useChat from "@/composable/chat.js";
 import Tag from "primevue/tag";
 import {router} from "@/router/index.js";
 import InlineMessage from "primevue/inlinemessage";
+import {onMounted} from "vue";
+import useUser from "@/composable/user.js";
 
 const {chat} = useChat();
+
+const {user} = useUser();
+
 
 </script>
 
@@ -19,7 +24,7 @@ const {chat} = useChat();
             <InlineMessage severity="info">Выберите чат</InlineMessage>
         </div>
 
-        <router-view v-else :chat="chat"/>
+        <router-view v-else/>
     </div>
 </template>
 

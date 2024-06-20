@@ -9,34 +9,43 @@ import Skeleton from 'primevue/skeleton';
 import Button from "primevue/button";
 import Badge from "primevue/badge";
 import ButtonGroup from "primevue/buttongroup";
-import {ref, watch} from "vue";
-
+import {onMounted, ref, watch} from "vue";
 import useChat from "../composable/chat.js";
-
+import useUser from "@/composable/user.js";
 const {viewChat, chats} = useChat();
-
+const {user} = useUser();
 let allChats = ref(chats.value)
-const isLoading = ref(false);
 
+const isLoading = ref(false);
+watch(() => chats.value, () => {
+    allChats.value = chats.value
+    console.log(allChats.value)
+})
 const searchInput = ref(null);
 
 const search = () => {
-    allChats.value = chats.value.filter(chat => chat.name.includes(searchInput.value));
+    watch(() => chats.value, () => {
+        allChats.value = chats.value.filter(chat => chat.name.includes(searchInput.value));
 
-    if (allChats.value.length === 0) {
-        isLoading.value = true;
-    } else {
-        isLoading.value = false;
-    }
+        if (allChats.value.length === 0) {
+            isLoading.value = true;
+        } else {
+            isLoading.value = false;
+        }
 
-    if (!searchInput.value) {
-        allChats.value = chats.value
-    }
+        if (!searchInput.value) {
+            allChats.value = chats.value
+        }
+    })
 }
 
 const viewAllChat = () => allChats.value = chats.value;
 
 const viewUnreadChat = () => allChats.value = chats.value.filter(chat => chat.new);
+
+
+onMounted(() => {
+})
 </script>
 
 <template>
@@ -55,19 +64,19 @@ const viewUnreadChat = () => allChats.value = chats.value.filter(chat => chat.ne
 
         <ScrollPanel v-if="!isLoading" style="width: 100%; calc(100vh - 190px);">
             <div class="chat-item" v-for="chat in allChats" @click="viewChat(chat.id)">
-                <Avatar style="width: 3rem !important;" :label="chat.name[0]" class="mr-2" size="large" shape="circle"/>
+                <Avatar style="width: 3rem !important;" label="A" class="mr-2" size="large" shape="circle"/>
                 <div class="chat-item__info">
                     <div class="chat-item__name">
                         <div class="name">
-                            <span>{{ chat.name }}</span>
+                            <span>{{ chat.client.name }}</span>
                             <Badge v-if="chat.new" size="small" value="3" severity="success"></Badge>
 
                             <!--                            <Tag v-if="chat.new" value="Новое"></Tag>-->
                         </div>
-                        <div class="date">{{ new Date().toLocaleTimeString() }}</div>
+                        <div class="date">{{ chat.lastMessage ? chat.lastMessage.timestamp : new Date().toLocaleTimeString() }}</div>
                     </div>
                     <div class="chat-item__text">
-                        {{ chat.text }}
+                        {{ chat.lastMessage ? chat.lastMessage.text : 'Пусто' }}
                     </div>
                 </div>
             </div>

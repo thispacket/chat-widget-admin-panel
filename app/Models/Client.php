@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Client extends Model
 {
@@ -14,4 +16,9 @@ class Client extends Model
         'email',
         'phone',
     ];
+
+    public function chat(): HasOne
+    {
+        return $this->hasOne(Chat::class);
+    }
 }
